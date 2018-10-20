@@ -1,5 +1,12 @@
 var express = require('express');
 var router = express.Router();
+var firebaseAdmin = require('../connections/firebase_admin')
+
+// test to connect the string 'any' in firebase
+// const ref = firebaseAdmin.ref('any')
+// ref.once('value',function(snapshot){
+//   console.log(snapshot.val())
+// })
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -11,15 +18,6 @@ router.get('/post', function(req, res, next) {
   res.render('post', { title: 'post' })
 })
 
-router.get('/dashboard/archives', function(req, res, next) {
-  res.render('dashboard/archives', { title: 'archives' })
-})
-router.get('/dashboard/article', function(req, res, next) {
-  res.render('dashboard/article', { title: 'article' })
-})
-router.get('/dashboard/categories', function(req, res, next) {
-  res.render('dashboard/categories', { title: 'categories' })
-})
 router.get('/dashboard/signup', function(req, res, next) {
   res.render('dashboard/signup', { title: 'signup' })
 })

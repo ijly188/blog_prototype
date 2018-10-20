@@ -1,2 +1,4 @@
 node_modules
 resource
+golden key.json
+.env
