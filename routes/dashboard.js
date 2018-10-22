@@ -12,7 +12,18 @@ router.get('/article', function(req, res, next) {
     res.render('dashboard/article', { title: 'article' })
 })
 router.get('/categories', function(req, res, next) {
-    res.render('dashboard/categories', { title: 'categories' })
+    categoriesRef.once('value').then(function(snapshot){
+        const categories = snapshot.val();
+        // console.log(categories)
+        // res.render('dashboard/categories', { 
+        //     title: 'Express' ,
+        //     categories: categories
+        // })
+        res.render('dashboard/categories', { 
+            title: 'Express' ,
+            categories
+        })
+    })
 })
 
 router.post('/categories/create', function(req, res){
@@ -30,6 +41,14 @@ router.post('/categories/create', function(req, res){
         console.log(error)
         res.redirect('/')
     })
+})
+
+// delete route
+router.post('/categories/delete/:id', function(req, res){
+    const id = req.param('id')
+    // console.log(id)
+    categoriesRef.child(id).remove()
+    res.redirect('/dashboard/categories')    
 })
 
 module.exports = router;
