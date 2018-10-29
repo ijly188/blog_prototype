@@ -1,13 +1,42 @@
 var express = require('express');
 var router = express.Router();
+const stringtags = require('striptags')
+const moment = require('moment')
 var firebaseAdmin = require('../connections/firebase_admin')
 
 // ref means reference
 const categoriesRef = firebaseAdmin.ref('/categories/')
 const articlesRef = firebaseAdmin.ref('/articles/')
 
+// archives
 router.get('/archives', function(req, res, next) {
-    res.render('dashboard/archives', { title: 'archives' })
+    const status = req.query.status || 'public'
+    let categories = {}
+    categoriesRef.once('value').then(function(snapshot){
+        categories = snapshot.val()
+        return articlesRef.orderByChild('update_time').once('value')
+    }).then(function(snapshot){
+        const articles = []
+        snapshot.forEach(function(snapshotChild){
+            if( status === snapshotChild.val().status){
+                // console.log('child',snapshotChild.val())
+                articles.push(snapshotChild.val())
+            }
+        })
+        articles.reverse()
+        // console.log(articles)
+        // data transform array
+        // articles = snapshot.val()
+        // console.log(categories, articles)
+        res.render('dashboard/archives', { 
+            title: 'archives' ,
+            articles,
+            categories,
+            stringtags,
+            moment,
+            status
+        })
+    })
 })
 
 // about article
@@ -69,6 +98,17 @@ router.post('/article/update/:id', function(req, res, next) {
     })
 })
 
+router.post('/article/delete/:id', function(req, res){
+    const id = req.param('id')
+    // console.log(id)
+    articlesRef.child(id).remove()
+    req.flash('info','文章已刪除')
+    // we use the ajax
+    res.send('文章已刪除')
+    res.end()
+    // res.redirect('/dashboard/categories')
+})
+
 // about categories
 router.get('/categories', function(req, res, next) {
     const message = req.flash('info')
@@ -118,7 +158,7 @@ router.post('/categories/delete/:id', function(req, res){
     // console.log(id)
     categoriesRef.child(id).remove()
     req.flash('info','欄位已刪除')
-    res.redirect('/dashboard/categories')    
+    res.redirect('/dashboard/categories')
 })
 
 module.exports = router;
