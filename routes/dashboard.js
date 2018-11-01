@@ -8,6 +8,16 @@ var firebaseAdmin = require('../connections/firebase_admin')
 const categoriesRef = firebaseAdmin.ref('/categories/')
 const articlesRef = firebaseAdmin.ref('/articles/')
 
+// dashboard index route
+router.get('/', (req, res) => {
+    const messages = req.flash('error')
+    res.render('dashboard/index', {
+        title: 'Express',
+        currentPath: '/',
+        hasErrors: messages.length > 0
+    })
+})
+
 // archives
 router.get('/archives', function(req, res, next) {
     const status = req.query.status || 'public'

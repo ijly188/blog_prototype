@@ -7,10 +7,12 @@ var logger = require('morgan');
 var flash = require('connect-flash')
 var session = require('express-session')
 
+require('dotenv').config()
 
 // router
 var indexRouter = require('./routes/index');
 var dashboardRouter = require('./routes/dashboard');
+var authRouter = require('./routes/auth');
 
 var app = express();
 
@@ -34,8 +36,18 @@ app.use(session({
 }))
 app.use(flash())
 
+// middleware
+const authCheck = function (req, res, next){
+  // console.log('middleware:', req.session)
+  if ( req.session.uid === process.env.ADMIN_UID){
+    return next();
+  }
+  return res.redirect('/auth/signin')
+}
+
 app.use('/', indexRouter);
-app.use('/dashboard', dashboardRouter);
+app.use('/dashboard', authCheck, dashboardRouter);
+app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
